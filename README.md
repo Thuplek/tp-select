@@ -4,6 +4,9 @@
 
 [![NPM](https://img.shields.io/npm/v/tp-select.svg)](https://www.npmjs.com/package/tp-select) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
+![Captura de tela de 2020-01-25 20-30-42](https://user-images.githubusercontent.com/44972192/73128686-dd225f00-3fb1-11ea-8d1d-b6bd5e31d438.png)
+
+
 ## Install
 
 ```bash
