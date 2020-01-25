@@ -122,11 +122,11 @@ class Example extends Component {
   {
     nmAgrupador:"valor",
     value:0,
-    itens:[label:"valor",value:1] // dentro de itens pode se passar outro campo itens
+    itens:[label:"valor",value:1] // dentro de itens pode se passar outro campo itens, e dentro dele outro e assim quantas vezes desejar.
   }
   // caso não queira agrupadores no select, basta que no array acima não exista o campo nmAgrupador
 ```
- * search: possibilita a busca por agrupadores
+ * search: possibilita a busca por agrupamento
  * showWay: mostra o caminho ate o item selecionado
 
 ## License
