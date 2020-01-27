@@ -49,30 +49,6 @@ const dados = [
           },
         ],
       },
-      {
-        value: 'nome 21',
-        label: 'valor 1',
-        itens: [
-          {
-            value: 'nivel 21',
-            label: 'valor 2',
-            itens: [
-              {
-                value: 'nivel 23',
-                label: 'valor 4',
-              },
-              {
-                value: 'nome 2001',
-                label: 'valor 7',
-              },
-            ],
-          },
-          {
-            label: 'valor 8',
-            value: 'nom 20',
-          },
-        ],
-      },
     ],
   },
   {
@@ -120,13 +96,13 @@ class Example extends Component {
   * dados: array no  seguinte foramato
 ```jsx
   {
-    nmAgrupador:"valor",
+    nmAgrupador:"nome do agrupador",
     value:0,
     itens:[label:"valor",value:1] // dentro de itens pode se passar outro campo itens, e dentro dele outro e assim quantas vezes desejar.
   }
   // caso não queira agrupadores no select, basta que no array acima não exista o campo nmAgrupador
 ```
- * search: possibilita a busca por agrupamento
+ * search: possibilita a busca dentro dos itens
  * showWay: mostra o caminho ate o item selecionado
 
 ## License
