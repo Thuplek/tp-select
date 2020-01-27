@@ -3,13 +3,15 @@ import PropTypes from 'prop-types'
 import Menu from './menu.jsx'
 import ArrowDown from './assets/img/arrow-down.png'
 import './styles.css'
+import TextLabel from './text-label.jsx'
 
 export default class TpSelect extends Component {
   constructor(props) {
     super(props)
     this.state = {
       valueInput: '',
-      dados: ''/* props.dados */
+      dados: '',/* props.dados */
+      qtdResultado:0
     }
     this.onChangeValue = this.onChangeValue.bind(this)
     this.toogleSubMenu = this.toogleSubMenu.bind(this)
@@ -32,6 +34,7 @@ export default class TpSelect extends Component {
     document.removeEventListener('mousedown', this.handleClickOutside)
   }
   tranformDados(dados) {
+    var contador = 0
     if (Array.isArray(dados)) {
       try {
         let dadosTransform = dados.map((item) => {
@@ -40,13 +43,17 @@ export default class TpSelect extends Component {
           }
           if (item.itens && Array.isArray(item.itens) && item.itens.length > 0) {
             item.open = false
+            item.key = `${item.label}-${item.value}-${contador}`
+            contador++
             transformSubItens(item.itens)
+          } else {
+            item.key = `${item.label}-${item.value}-${contador}`
           }
           return item
         })
         return dadosTransform
       } catch (error) {
-        console.log(error)
+        console.error(error)
       }
     } else {
       // eslint-disable-next-line no-return-assign
@@ -61,7 +68,11 @@ export default class TpSelect extends Component {
           }
           if (item.itens && Array.isArray(item.itens) && item.itens.length > 0) {
             item.open = false
+            item.key = `${item.label}-${item.value}-${contador}`
+            contador++
             transformSubItens(item.itens)
+          } else {
+            item.key = `${item.label}-${item.value}-${contador}`
           }
 
           return item
@@ -113,21 +124,21 @@ export default class TpSelect extends Component {
     }
   }
 
-  onChangeValue(value, label = null) {
+  onChangeValue(key, value, label = null) {
     if (this.props.showWay) {
       let caminho = []
       let encontrado = false
       try {
         this.state.dados.map((item) => {
           if (!encontrado) {
-            caminho.push({value: item.value, label: item.nmAgrupador ? item.nmAgrupador : item.label})
+            caminho.push({key: key, value: item.value, label: item.nmAgrupador ? item.nmAgrupador : item.label})
             if (item.itens) {
               vfSubNivel(item.itens)
               if (!encontrado) {
                 caminho = []
               }
             } else {
-              if (item.value === value) {
+              if (item.key === key) {
                 encontrado = true
               } else {
                 caminho.pop()
@@ -137,7 +148,7 @@ export default class TpSelect extends Component {
         })
       } catch (error) {
         console.error(error)
-        itens = Object.values(itens)
+        /* itens = Object.values(itens) */
       }
 
       let caminhoString = {}
@@ -151,12 +162,13 @@ export default class TpSelect extends Component {
         this.props.onChange(caminhoString.value = caminho.pop())
       }
 
+      // eslint-disable-next-line no-inner-declarations
       function vfSubNivel(itens) {
         try {
           itens.map((item) => {
             if (!encontrado) {
               if (item.value) {
-                caminho.push({value: item.value, label: item.nmAgrupador ? item.nmAgrupador : item.label})
+                caminho.push({key: key, value: item.value, label: item.nmAgrupador ? item.nmAgrupador : item.label})
               }
               if (item.itens) {
                 vfSubNivel(item.itens)
@@ -164,7 +176,7 @@ export default class TpSelect extends Component {
                   caminho.pop()
                 }
               } else {
-                if (item.value === value) {
+                if (item.key === key) {
                   encontrado = true
                 } else {
                   caminho.pop()
@@ -175,8 +187,8 @@ export default class TpSelect extends Component {
           })
         } catch (error) {
           console.error(error)
-          itens = Object.values(itens)
-        }
+/*           itens = Object.values(itens)
+ */        }
       }
     } else {
       this.setState({
@@ -196,10 +208,13 @@ export default class TpSelect extends Component {
     this.setState({
       isOpen: !(this.state.isOpen)
     })
+    if (!this.state.isOpen) {
+      document.getElementById('input-comboBox').focus()
+    }
   }
   toogleSubMenu(value) {
     let dados = this.state.dados.map((item) => {
-      if (item.value === value) {
+      if (item.key === value) {
         item.open = !item.open
       }
       if (item.itens) {
@@ -212,7 +227,7 @@ export default class TpSelect extends Component {
     function tgSubNivel(value, itens) {
       try {
         itens.map((item) => {
-          if (item.value === value) {
+          if (item.key === value) {
             item.open = !item.open
           }
           if (item.itens) {
@@ -221,28 +236,58 @@ export default class TpSelect extends Component {
           return item
         })
       } catch (error) {
-        itens = Object.values(itens)
+
         console.error(error)
       }
     }
   }
-  filtrar(value) {
-    if (this.props.search) {
-      var dados = this.props.dados.filter((item) => {
-        if (item.nmAgrupador.includes(value)) {
-          return true
+
+  search(value, dados) {
+    var qtddR = 0;
+    this.setState({isOpen: true})
+    dados = filtrar(value, dados)
+    if (!(dados.length > 0)) {
+      dados = [{ value: 'Sem dados', label: 'Sem Resultados', 'disable': true }]
+    }
+    this.setState({
+      dados: dados,
+      valueInput: {label: value},
+      qtdResultado:qtddR
+    })
+
+    function filtrar (value, dados) {
+      var matches = []
+      if (!Array.isArray(dados)) return matches
+
+      dados.forEach(function(i) {
+        if (i.nmAgrupador) {
+          if (i.nmAgrupador.toUpperCase().includes(value.toUpperCase())) {
+            qtddR++
+            matches.push(i)
+          } else {
+            i.open = false;
+            let childResults = filtrar(value, i.itens)
+            if (childResults.length) { matches.push(Object.assign({}, i, { itens: childResults, open: true })) }
+          }
         } else {
-          return false
+          if (i.label.toUpperCase().includes(value.toUpperCase())) {
+            qtddR++
+            matches.push(i)
+          } else {
+            i.open = false;
+            let childResults = filtrar(value, i.itens)
+            if (childResults.length) { matches.push(Object.assign({}, i, { itens: childResults, open: true })) }
+
+          }
         }
       })
-      this.setState({
-        dados: dados,
-        valueInput: {label: value}
-      })
-    }
+
+      return matches
+    };
+
   }
   render() {
-    const { valueInput, isOpen, dados } = this.state
+    const { valueInput, isOpen, dados, qtdResultado } = this.state
 
     return (
       <div className='ComboBox-root' ref={this.container} >
@@ -250,10 +295,11 @@ export default class TpSelect extends Component {
           <input
             id='input-comboBox'
             placeholder={'Selecione...'}
-            className='inputComboBox'
+            className={`inputComboBox ${this.props.search ? 'search' : ''}`}
             readOnly={!this.props.search}
+            autoComplete='off'
             // defaultValue={valueInput.label}
-            onChange={(event) => this.filtrar(event.target.value)}
+            onChange={(event) => this.search(event.target.value, this.props.dados)}
             value={valueInput.label}
           />
           <img className={`arrow-down ${isOpen ? 'rotate' : ''} `} src={ArrowDown} />
@@ -265,7 +311,7 @@ export default class TpSelect extends Component {
                 ? <div key={`${item.value}`}>
                   {item.nmAgrupador && item.itens && Array.isArray(item.itens) && item.itens.length > 0
                     ? <p
-                      key={`p-titleAgrupador-${item.value}`}
+                      key={`p-titleAgrupador-${item.key}`}
                       className='title-Agrupador'>
                       {item.nmAgrupador}
                       <span>
@@ -277,10 +323,11 @@ export default class TpSelect extends Component {
                   {
                     item.itens.map((item) =>
                       <Menu
-                        key={`Menu-${item.value}`}
+                        key={`Menu-${item.key}`}
                         agrupador dados={item}
                         toogleSubMenu={(value) => this.toogleSubMenu(value)}
                         onChangeValue={(value, label) => this.onChangeValue(value, label)}
+                        inputValue={valueInput.label}
                       />
                     )
                   }
@@ -289,11 +336,19 @@ export default class TpSelect extends Component {
                   dados={item}
                   toogleSubMenu={(value) => this.toogleSubMenu(value)}
                   onChangeValue={(value, label) => this.onChangeValue(value, label)}
+                  inputValue={valueInput.label}
+
                 />
             ))}
+          {/* <p className="rCorrespondente">{`${valueInput.label && qtdResultado >= 0 ? `foram encontrados ${qtdResultado} resultados` : ""}`}</p> */}
           </div>
         ) : ''}
       </div>
     )
   }
+}
+TpSelect.defaultProps = {
+  search: false,
+  showWay: false,
+  dados: [{ value: 'Sem dados', label: 'Sem Resultados', 'disable': true }]
 }
