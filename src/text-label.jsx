@@ -24,7 +24,7 @@ export default class TextLabel extends Component {
     </span>
   }
 }
-/* TextLabel.PropTypes = {
+/* TextLabel.propTypes = {
   value: PropTypes.isRequired,
   result: PropTypes.isRequired,
   subKey: PropTypes.isRequired
