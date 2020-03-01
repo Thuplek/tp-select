@@ -12,7 +12,6 @@ export default class TextLabel extends Component {
   render() {
     const {result, value, subKey } = this.props
     return <span>
-
       { value.split(result).map((item, index) => {
         return <span key={`label-${subKey}-${index}`}>
           {item}{index < (value.split(result).length) - 1 ? <b>{result}</b> : ''}

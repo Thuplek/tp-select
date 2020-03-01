@@ -102,8 +102,13 @@ class Example extends Component {
   }
   // caso não queira agrupadores no select, basta que no array acima não exista o campo nmAgrupador
 ```
- * search: possibilita a busca dentro dos itens
- * showWay: mostra o caminho ate o item selecionado
+ * search : possibilita a busca dentro dos itens
+ * showWay : mostra o caminho ate o item selecionado
+ * options : recebe um objeto, que tem os seguintes atributos.
+    * NameValue : Define o nome do campo referente ao value,
+    * NameLabel : Define o nome do campo referente a label,
+    * NameSubLevel : Define o nome do campo referente a itens
+* value : recebe o valor inicial do select
 
 ## License
 

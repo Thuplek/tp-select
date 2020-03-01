@@ -24,8 +24,6 @@ function SubNivel(props) {
 }
 export default function Menu(props) {
   const {dados, inputValue, agrupador, options: {nameLabel, nameValue, nameSubLevel}, options} = props
-  console.log(props, 'props')
-  console.log(dados, 'dados')
   return (
     <div key={'Menu'} className={'menu'}>
       <p
